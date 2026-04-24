@@ -22,14 +22,17 @@
           />
         </div>
         <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
-        <button type="submit">로그인</button>
+        <!-- 수정된 버튼 (로딩 중 비활성화) -->
+        <button type="submit" :disabled="isLoading">
+          {{ isLoading ? '로그인 중...' : '로그인' }}
+        </button>
       </form>
     </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
+import api from '../../api/axios.js' // 방금 만든 axios 인스턴스 사용
 
 export default {
   name: 'LoginView',
@@ -37,21 +40,29 @@ export default {
     return {
       username: '',
       password: '',
-      errorMessage: ''
+      errorMessage: '',
+      isLoading: false // 로그인 중 버튼 비활성화용
     }
   },
   methods: {
     async handleLogin() {
+      // 로딩 시작
+      this.isLoading = true
+      this.errorMessage = ''
+
       try {
-        const response = await axios.post('http://localhost:8080/api/auth/login', {
+        // Spring Boot 로그인 API 호출
+        const response = await api.post('/api/auth/login', {
           username: this.username,
           password: this.password
         })
-        const { token, role } = response.data
 
-        // JWT 토큰 저장
+        const { token, role, username } = response.data
+
+        // JWT 토큰과 역할을 브라우저에 저장
         localStorage.setItem('token', token)
         localStorage.setItem('role', role)
+        localStorage.setItem('username', username)
 
         // 역할별 화면 이동
         if (role === 'ADMIN') {
@@ -61,8 +72,17 @@ export default {
         } else if (role === 'VIEWER') {
           this.$router.push('/meal-view')
         }
+
       } catch (error) {
-        this.errorMessage = '아이디 또는 비밀번호가 올바르지 않습니다.'
+        // 로그인 실패 시 에러 메시지 표시
+        if (error.response && error.response.status === 401) {
+          this.errorMessage = '아이디 또는 비밀번호가 올바르지 않습니다.'
+        } else {
+          this.errorMessage = '서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.'
+        }
+      } finally {
+        // 로딩 종료
+        this.isLoading = false
       }
     }
   }
