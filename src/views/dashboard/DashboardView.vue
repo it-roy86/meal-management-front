@@ -21,6 +21,12 @@
         <div class="menu-title">현황 조회</div>
         <div class="menu-desc">식사 현황 조회</div>
       </div>
+      <!-- 기존 메뉴 카드 아래에 추가 -->
+      <div class="menu-card" @click="$router.push('/settlement')">
+        <div class="menu-icon">💰</div>
+        <div class="menu-title">월별 정산</div>
+        <div class="menu-desc">월별 식사 비용 정산</div>
+      </div>
     </div>
   </div>
 </template>

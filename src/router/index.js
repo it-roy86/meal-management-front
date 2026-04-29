@@ -58,6 +58,13 @@ const router = createRouter({
             path: '/meal-view',
             name: 'meal-view',
             component: () => import('../views/meal/MealView.vue')
+        },
+        {
+            // 월별 정산 화면 - ADMIN/VIEWER 접근 가능
+            // 회사별 월간 식사 비용을 정산해요.
+            path: '/settlement',
+            name: 'settlement',
+            component: () => import('../views/settlement/SettlementView.vue')
         }
     ]
 })
