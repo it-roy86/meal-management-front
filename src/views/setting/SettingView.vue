@@ -16,6 +16,7 @@
         <button class="btn-add" @click="openCompanyModal(null)">+ 회사 추가</button>
       </div>
 
+      <!-- PC 테이블 -->
       <table class="table">
         <thead>
         <tr>
@@ -46,7 +47,28 @@
         </tr>
         </tbody>
       </table>
-    </div>
+
+      <!-- 모바일 카드 목록 (회사) -->
+      <div class="mobile-list">
+        <div class="mobile-card" v-for="company in companies" :key="company.id">
+          <div class="mobile-card-info">
+            <span class="mobile-card-name">{{ company.companyName }}</span>
+            <span class="mobile-card-sub">{{ company.businessNumber || '사업자번호 없음' }}</span>
+            <span class="mobile-card-sub">{{ company.contactEmail || '이메일 없음' }}</span>
+            <span class="mobile-card-sub">
+              <span :class="company.isActive ? 'badge-active' : 'badge-inactive'">
+                {{ company.isActive ? '활성' : '비활성' }}
+              </span>
+            </span>
+          </div>
+          <div class="mobile-card-buttons">
+            <button class="btn-edit" @click="openCompanyModal(company)">수정</button>
+            <button class="btn-team" @click="selectCompany(company)">팀</button>
+          </div>
+        </div>
+        <div v-if="companies.length === 0" class="empty">등록된 회사가 없습니다.</div>
+      </div>
+    </div>  <!-- ← 회사 섹션 닫기 -->
 
     <!-- 팀 목록 섹션 -->
     <div class="section" v-if="selectedCompany">
@@ -55,6 +77,7 @@
         <button class="btn-add" @click="openTeamModal(null)">+ 팀 추가</button>
       </div>
 
+      <!-- PC 테이블 -->
       <table class="table">
         <thead>
         <tr>
@@ -84,7 +107,31 @@
         </tr>
         </tbody>
       </table>
-    </div>
+
+      <!-- 모바일 카드 목록 (팀) -->
+      <div class="mobile-list">
+        <div class="mobile-card" v-for="team in teams" :key="team.id">
+          <div class="mobile-card-info">
+            <span class="mobile-card-name">{{ team.teamName }}</span>
+            <span class="mobile-card-sub">
+              중식 {{ team.lunchPrice != null ? team.lunchPrice.toLocaleString() : '-' }}원
+            </span>
+            <span class="mobile-card-sub">
+              석식 {{ team.dinnerPrice != null ? team.dinnerPrice.toLocaleString() : '-' }}원
+            </span>
+            <span class="mobile-card-sub">
+              <span :class="team.isActive ? 'badge-active' : 'badge-inactive'">
+                {{ team.isActive ? '활성' : '비활성' }}
+              </span>
+            </span>
+          </div>
+          <div class="mobile-card-buttons">
+            <button class="btn-edit" @click="openTeamModal(team)">수정</button>
+          </div>
+        </div>
+        <div v-if="teams.length === 0" class="empty">등록된 팀이 없습니다.</div>
+      </div>
+    </div>  <!-- ← 팀 섹션 닫기 -->
 
     <!-- 회사 등록/수정 모달 -->
     <div class="modal-overlay" v-if="showCompanyModal" @click.self="closeCompanyModal">
@@ -397,22 +444,6 @@ export default {
   padding: 30px !important;
 }
 
-.badge-active {
-  background: #e8f5e9;
-  color: #2e7d32;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 12px;
-}
-
-.badge-inactive {
-  background: #fce4ec;
-  color: #c62828;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 12px;
-}
-
 .btn-add {
   background: #4a90e2;
   color: white;
@@ -541,5 +572,87 @@ export default {
 
 .btn-home:hover {
   background: #e0e0e0;
+}
+
+/* PC 화면에서는 모바일 카드 숨기기 */
+.mobile-list {
+  display: none;
+}
+
+/* 모바일 화면 대응 (768px 이하) */
+@media (max-width: 768px) {
+
+  .setting-container {
+    padding: 16px;
+  }
+
+  .section {
+    padding: 16px;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .section-header h3 {
+    font-size: 16px;
+  }
+
+  .btn-add {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* 모바일에서 테이블 숨기기 */
+  .table {
+    display: none;
+  }
+
+  /* 모바일 카드 목록 보이기 */
+  .mobile-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .mobile-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .mobile-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .mobile-card-name {
+    font-size: 15px;
+    font-weight: 500;
+    color: #333;
+  }
+
+  .mobile-card-sub {
+    font-size: 12px;
+    color: #888;
+  }
+
+  .mobile-card-buttons {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  /* 모달 너비 조정 */
+  .modal {
+    width: 90%;
+    padding: 20px;
+  }
 }
 </style>

@@ -148,4 +148,44 @@ export default {
   font-size: 13px;
   color: #888;
 }
+
+/* 모바일 화면 대응 (768px 이하) */
+@media (max-width: 768px) {
+
+  .dashboard-container {
+    padding: 20px;
+  }
+
+  .header h2 {
+    font-size: 18px;
+  }
+
+  /* 메뉴 카드 1열로 세로 나열 */
+  .menu-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .menu-card {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    text-align: left;
+  }
+
+  .menu-icon {
+    font-size: 32px;
+    margin-bottom: 0;
+    flex-shrink: 0;
+  }
+
+  .menu-title {
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+
+  .menu-desc {
+    font-size: 12px;
+  }
+}
 </style>

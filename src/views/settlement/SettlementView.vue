@@ -82,6 +82,53 @@
           </tr>
           </tfoot>
         </table>
+        <!-- 모바일 카드 목록 (팀별 정산) -->
+        <div class="mobile-list">
+          <div
+              class="mobile-team-card"
+              v-for="team in settlement.teams"
+              :key="team.teamName"
+          >
+            <div class="mobile-team-header">
+              <span class="mobile-team-name">{{ team.teamName }}</span>
+              <span class="mobile-team-total">{{ team.totalAmount.toLocaleString() }}원</span>
+            </div>
+            <div class="mobile-team-row">
+              <div class="mobile-team-item">
+                <span class="mobile-team-label">중식</span>
+                <span class="mobile-team-value">{{ team.lunchCount }}명</span>
+                <span class="mobile-team-amount">{{ team.lunchAmount.toLocaleString() }}원</span>
+              </div>
+              <div class="mobile-team-divider"></div>
+              <div class="mobile-team-item">
+                <span class="mobile-team-label">석식</span>
+                <span class="mobile-team-value">{{ team.dinnerCount }}명</span>
+                <span class="mobile-team-amount">{{ team.dinnerAmount.toLocaleString() }}원</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 합계 카드 -->
+          <div class="mobile-summary-card">
+            <div class="mobile-team-header">
+              <span class="mobile-team-name">합계</span>
+              <span class="mobile-team-total">{{ settlement.totalAmount.toLocaleString() }}원</span>
+            </div>
+            <div class="mobile-team-row">
+              <div class="mobile-team-item">
+                <span class="mobile-team-label">중식</span>
+                <span class="mobile-team-value">{{ settlement.totalLunchCount }}명</span>
+                <span class="mobile-team-amount">{{ settlement.totalLunchAmount.toLocaleString() }}원</span>
+              </div>
+              <div class="mobile-team-divider"></div>
+              <div class="mobile-team-item">
+                <span class="mobile-team-label">석식</span>
+                <span class="mobile-team-value">{{ settlement.totalDinnerCount }}명</span>
+                <span class="mobile-team-amount">{{ settlement.totalDinnerAmount.toLocaleString() }}원</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- 전체 합계 -->
@@ -345,5 +392,148 @@ export default {
   text-align: center;
   color: #999;
   padding: 30px;
+}
+
+/* PC 화면에서 모바일 카드 숨기기 */
+.mobile-list {
+  display: none;
+}
+
+/* 모바일 화면 대응 (768px 이하) */
+@media (max-width: 768px) {
+
+  .settlement-container {
+    padding: 16px;
+  }
+
+  /* 검색 조건 세로 정렬 */
+  .search-card {
+    padding: 16px;
+  }
+
+  .search-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-item input,
+  .search-item select {
+    width: 100%;
+  }
+
+  .btn-search {
+    width: 100%;
+    height: 42px;
+  }
+
+  /* 결과 카드 */
+  .result-card {
+    padding: 16px;
+  }
+
+  /* 회사 헤더 */
+  .company-header h3 {
+    font-size: 16px;
+  }
+
+  /* 테이블 숨기기 */
+  .table {
+    display: none;
+  }
+
+  /* 모바일 카드 목록 보이기 */
+  .mobile-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  /* 팀 카드 */
+  .mobile-team-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* 합계 카드 */
+  .mobile-summary-card {
+    background: #e8f4fd;
+    border-radius: 8px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-weight: bold;
+  }
+
+  /* 팀명 + 합계 금액 */
+  .mobile-team-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .mobile-team-name {
+    font-size: 15px;
+    font-weight: 500;
+    color: #333;
+  }
+
+  .mobile-team-total {
+    font-size: 15px;
+    font-weight: bold;
+    color: #4a90e2;
+  }
+
+  /* 중식/석식 행 */
+  .mobile-team-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .mobile-team-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    gap: 2px;
+  }
+
+  .mobile-team-label {
+    font-size: 11px;
+    color: #888;
+  }
+
+  .mobile-team-value {
+    font-size: 14px;
+    color: #333;
+  }
+
+  .mobile-team-amount {
+    font-size: 13px;
+    color: #555;
+  }
+
+  .mobile-team-divider {
+    width: 1px;
+    height: 40px;
+    background: #ddd;
+  }
+
+  /* 전체 합계 */
+  .grand-total {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+
+  .grand-amount {
+    font-size: 18px;
+  }
 }
 </style>

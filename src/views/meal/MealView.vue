@@ -75,6 +75,26 @@
         </tbody>
       </table>
 
+      <!-- 모바일 카드 목록 -->
+      <div class="mobile-list">
+        <div class="mobile-record-card" v-for="record in mealRecords" :key="record.id">
+          <div class="mobile-record-header">
+            <span class="mobile-record-date">{{ record.recordDate }}</span>
+            <span class="mobile-record-amount">{{ record.totalAmount?.toLocaleString() }}원</span>
+          </div>
+          <div class="mobile-record-body">
+            <span class="mobile-record-company">🏢 {{ record.companyName }}</span>
+            <span class="mobile-record-team">👥 {{ record.teamName }}</span>
+          </div>
+          <div class="mobile-record-footer">
+            <span>중식 {{ record.lunchCount }}명</span>
+            <span>석식 {{ record.dinnerCount }}명</span>
+            <span>총 {{ record.totalCount }}명</span>
+          </div>
+        </div>
+        <div v-if="mealRecords.length === 0" class="empty">조회된 데이터가 없습니다.</div>
+      </div>
+
       <!-- 합계 -->
       <div class="summary" v-if="mealRecords.length > 0">
         <span>총 중식: {{ totalLunchCount }}명</span>
@@ -332,5 +352,117 @@ export default {
   font-weight: bold;
   color: #333;
   font-size: 15px;
+}
+
+/* PC 화면에서 모바일 카드 숨기기 */
+.mobile-list {
+  display: none;
+}
+
+/* 모바일 화면 대응 (768px 이하) */
+@media (max-width: 768px) {
+
+  .meal-view-container {
+    padding: 16px;
+  }
+
+  /* 검색 조건 세로 정렬 */
+  .search-card {
+    padding: 16px;
+  }
+
+  .search-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-item input,
+  .search-item select {
+    width: 100%;
+  }
+
+  .btn-search {
+    width: 100%;
+    height: 42px;
+  }
+
+  /* 결과 카드 */
+  .result-card {
+    padding: 16px;
+  }
+
+  /* 테이블 숨기기 */
+  .table {
+    display: none;
+  }
+
+  /* 모바일 카드 목록 보이기 */
+  .mobile-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .mobile-record-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* 날짜 + 금액 */
+  .mobile-record-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .mobile-record-date {
+    font-size: 13px;
+    color: #888;
+  }
+
+  .mobile-record-amount {
+    font-size: 15px;
+    font-weight: bold;
+    color: #4a90e2;
+  }
+
+  /* 회사명 + 팀명 */
+  .mobile-record-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .mobile-record-company {
+    font-size: 15px;
+    font-weight: 500;
+    color: #333;
+  }
+
+  .mobile-record-team {
+    font-size: 13px;
+    color: #555;
+  }
+
+  /* 인원 정보 */
+  .mobile-record-footer {
+    display: flex;
+    gap: 12px;
+    font-size: 12px;
+    color: #888;
+    border-top: 1px solid #eee;
+    padding-top: 8px;
+  }
+
+  /* 합계 세로 정렬 */
+  .summary {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+  }
 }
 </style>
