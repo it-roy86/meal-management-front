@@ -391,4 +391,16 @@ export default {
 }
 
 .btn-save:hover { background: #357abd; }
+
+/* 숫자 입력 화살표 제거 (Chrome, Safari, Edge) */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* 숫자 입력 화살표 제거 (Firefox) */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
 </style>

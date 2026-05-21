@@ -57,6 +57,7 @@
           <th>석식 인원</th>
           <th>총 인원</th>
           <th>합계 금액</th>
+          <th>관리</th>
         </tr>
         </thead>
         <tbody>
@@ -68,9 +69,12 @@
           <td>{{ record.dinnerCount }}명</td>
           <td>{{ record.totalCount }}명</td>
           <td>{{ record.totalAmount?.toLocaleString() }}원</td>
+          <td>
+            <button class="btn-edit-record" @click="openEditModal(record)">✏️ 수정</button>
+          </td>
         </tr>
         <tr v-if="mealRecords.length === 0">
-          <td colspan="7" class="empty">조회된 데이터가 없습니다.</td>
+          <td colspan="8" class="empty">조회된 데이터가 없습니다.</td>
         </tr>
         </tbody>
       </table>
@@ -87,15 +91,73 @@
             <span class="mobile-record-team">👥 {{ record.teamName }}</span>
           </div>
           <div class="mobile-record-footer">
-            <span>중식 {{ record.lunchCount }}명</span>
-            <span>석식 {{ record.dinnerCount }}명</span>
-            <span>총 {{ record.totalCount }}명</span>
+            <div class="mobile-record-counts">
+              <span>중식 {{ record.lunchCount }}명</span>
+              <span>석식 {{ record.dinnerCount }}명</span>
+              <span>총 {{ record.totalCount }}명</span>
+            </div>
+            <button class="btn-edit-record" @click="openEditModal(record)">✏️ 수정</button>
           </div>
         </div>
         <div v-if="mealRecords.length === 0" class="empty">조회된 데이터가 없습니다.</div>
       </div>
 
       <!-- 합계 -->
+      <!-- 수정 모달 -->
+      <div class="modal-overlay" v-if="showEditModal" @click.self="closeEditModal">
+        <div class="modal">
+          <h3>✏️ 식사 기록 수정</h3>
+
+          <!-- 수정 불가 정보 (읽기 전용) -->
+          <div class="modal-info">
+            <div class="info-row">
+              <span class="info-label">날짜</span>
+              <span class="info-value">{{ editingRecord?.recordDate }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">회사</span>
+              <span class="info-value">{{ editingRecord?.companyName }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">팀명</span>
+              <span class="info-value">{{ editingRecord?.teamName }}</span>
+            </div>
+          </div>
+
+          <div class="modal-divider"></div>
+
+          <!-- 수정 가능 항목 -->
+          <div class="form-group">
+            <label>중식 인원</label>
+            <div class="input-with-unit">
+              <input
+                  type="number"
+                  v-model="editForm.lunchCount"
+                  min="0"
+                  placeholder="0"
+              />
+              <span class="unit">명</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>석식 인원</label>
+            <div class="input-with-unit">
+              <input
+                  type="number"
+                  v-model="editForm.dinnerCount"
+                  min="0"
+                  placeholder="0"
+              />
+              <span class="unit">명</span>
+            </div>
+          </div>
+
+          <div class="modal-buttons">
+            <button class="btn-cancel" @click="closeEditModal">취소</button>
+            <button class="btn-save" @click="updateMealRecord">저장</button>
+          </div>
+        </div>
+      </div>
       <div class="summary" v-if="mealRecords.length > 0">
         <span>총 중식: {{ totalLunchCount }}명</span>
         <span>총 석식: {{ totalDinnerCount }}명</span>
@@ -129,7 +191,14 @@ export default {
       companies: [],
 
       // 식사 기록 목록
-      mealRecords: []
+      mealRecords: [],
+      // 수정 모달
+      showEditModal: false,
+      editingRecord: null,
+      editForm: {
+        lunchCount: 0,
+        dinnerCount: 0
+      }
     }
   },
 
@@ -190,6 +259,47 @@ export default {
         this.mealRecords = response.data
       } catch (error) {
         alert('식사 기록을 불러오는데 실패했습니다.')
+      }
+    },
+    /**
+     * 수정 모달 열기
+     * 선택한 식사 기록의 기존 데이터를 폼에 채워요.
+     */
+    openEditModal(record) {
+      this.editingRecord = record
+      this.editForm = {
+        lunchCount: record.lunchCount,
+        dinnerCount: record.dinnerCount
+      }
+      this.showEditModal = true
+    },
+
+    // 수정 모달 닫기
+    closeEditModal() {
+      this.showEditModal = false
+      this.editingRecord = null
+    },
+
+    /**
+     * 식사 기록 수정
+     * PUT /api/meal-records/{id} API 호출
+     * 저장 후 목록 새로고침
+     */
+    async updateMealRecord() {
+      if (this.editForm.lunchCount < 0 || this.editForm.dinnerCount < 0) {
+        alert('인원은 0명 이상이어야 해요.')
+        return
+      }
+      try {
+        await api.put(`/api/meal-records/${this.editingRecord.id}`, {
+          lunchCount: this.editForm.lunchCount || 0,
+          dinnerCount: this.editForm.dinnerCount || 0
+        })
+        alert('수정되었습니다!')
+        this.closeEditModal()
+        await this.loadMealRecords()
+      } catch (error) {
+        alert('수정에 실패했습니다.')
       }
     }
   }
@@ -359,6 +469,18 @@ export default {
   display: none;
 }
 
+/* 숫자 입력 화살표 제거 (Chrome, Safari, Edge) */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* 숫자 입력 화살표 제거 (Firefox) */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 /* 모바일 화면 대응 (768px 이하) */
 @media (max-width: 768px) {
 
@@ -463,6 +585,159 @@ export default {
     flex-direction: column;
     align-items: flex-end;
     gap: 8px;
+  }
+  .btn-edit-record {
+    background: #fff3e0;
+    color: #e65100;
+    border: 1px solid #e65100;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .btn-edit-record:hover {
+    background: #e65100;
+    color: white;
+  }
+
+  .modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .modal {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    width: 380px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  }
+
+  .modal h3 {
+    margin-bottom: 20px;
+    font-size: 18px;
+    color: #333;
+  }
+
+  .modal-info {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    font-size: 14px;
+  }
+
+  .info-label {
+    color: #888;
+  }
+
+  .info-value {
+    color: #333;
+    font-weight: 500;
+  }
+
+  .modal-divider {
+    border-top: 1px solid #eee;
+    margin-bottom: 16px;
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    color: #555;
+  }
+
+  .input-with-unit {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .input-with-unit input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    text-align: right;
+  }
+
+  .input-with-unit input:focus {
+    outline: none;
+    border-color: #4a90e2;
+  }
+
+  .unit {
+    font-size: 14px;
+    color: #555;
+  }
+
+  .modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+
+  .btn-cancel {
+    background: #f0f0f0;
+    color: #333;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .btn-save {
+    background: #4a90e2;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .btn-save:hover { background: #357abd; }
+
+  /* 모바일 수정 버튼 */
+  .mobile-record-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .mobile-record-counts {
+    display: flex;
+    gap: 12px;
+    font-size: 12px;
+    color: #888;
+  }
+
+  /* 모바일 모달 */
+  @media (max-width: 768px) {
+    .modal {
+      width: 90%;
+      padding: 20px;
+    }
   }
 }
 </style>
