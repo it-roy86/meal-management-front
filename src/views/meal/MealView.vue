@@ -57,7 +57,7 @@
           <th>석식 인원</th>
           <th>총 인원</th>
           <th>합계 금액</th>
-          <th>관리</th>
+          <th v-if="role === 'ADMIN'">관리</th>
         </tr>
         </thead>
         <tbody>
@@ -69,7 +69,7 @@
           <td>{{ record.dinnerCount }}명</td>
           <td>{{ record.totalCount }}명</td>
           <td>{{ record.totalAmount?.toLocaleString() }}원</td>
-          <td>
+          <td v-if="role === 'ADMIN'">
             <button class="btn-edit-record" @click="openEditModal(record)">✏️ 수정</button>
           </td>
         </tr>
@@ -96,7 +96,7 @@
               <span>석식 {{ record.dinnerCount }}명</span>
               <span>총 {{ record.totalCount }}명</span>
             </div>
-            <button class="btn-edit-record" @click="openEditModal(record)">✏️ 수정</button>
+            <button class="btn-edit-record" v-if="role === 'ADMIN'"[4="]e" @click="openEditModal(record)">✏️ 수정</button>
           </div>
         </div>
         <div v-if="mealRecords.length === 0" class="empty">조회된 데이터가 없습니다.</div>
