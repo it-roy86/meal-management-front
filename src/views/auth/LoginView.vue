@@ -140,10 +140,9 @@ export default {
           username: this.username,
           password: this.password
         })
-        const { token, role, username } = response.data
-
-        // JWT 토큰과 사용자 정보 저장
-        localStorage.setItem('token', token)
+        const { role, username } = response.data
+        // JWT는 서버가 httpOnly 쿠키로 내려줘서 여기서 다룰 필요 없어요.
+        // role/username은 화면 분기·표시용으로만 localStorage에 저장해요.
         localStorage.setItem('role', role)
         localStorage.setItem('username', username)
 
@@ -172,10 +171,8 @@ export default {
           companyId: this.viewerForm.companyId,
           businessNumberLast4: this.viewerForm.businessNumberLast4
         })
-        const { token, role, username } = response.data
-
-        // JWT 토큰과 사용자 정보 저장
-        localStorage.setItem('token', token)
+        const { role, username } = response.data
+        // JWT는 서버가 httpOnly 쿠키로 내려줘서 여기서 다룰 필요 없어요.
         localStorage.setItem('role', role)
         localStorage.setItem('username', username)
 

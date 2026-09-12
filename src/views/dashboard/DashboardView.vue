@@ -55,6 +55,8 @@
 </template>
 
 <script>
+import api from '../../api/axios'
+
 export default {
   name: 'DashboardView',
   data() {
@@ -67,14 +69,20 @@ export default {
   methods: {
     /**
      * 로그아웃 메서드
-     * localStorage에 저장된 JWT 토큰과 사용자 정보를 삭제하고
-     * 로그인 화면으로 이동해요.
+     * JWT는 httpOnly 쿠키로 관리되어 JS로 직접 지울 수 없어서,
+     * 서버에 로그아웃 요청을 보내 쿠키를 만료시킨 뒤
+     * 화면 분기용 localStorage 정보를 정리하고 로그인 화면으로 이동해요.
      */
-    logout() {
-      localStorage.removeItem('token')
-      localStorage.removeItem('role')
-      localStorage.removeItem('username')
-      this.$router.push('/')
+    async logout() {
+      try {
+        await api.post('/api/auth/logout')
+      } catch (error) {
+        console.error('로그아웃 요청 실패', error)
+      } finally {
+        localStorage.removeItem('role')
+        localStorage.removeItem('username')
+        this.$router.push('/')
+      }
     }
   }
 }
