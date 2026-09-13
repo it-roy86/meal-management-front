@@ -332,10 +332,15 @@ export default {
   align-items: center;
   flex: 1;
   gap: 8px;
+  /* flex 아이템은 기본적으로 min-width: auto라서 내용 크기보다 안 줄어들어요.
+     그래서 화면이 좁아지면 이 박스가 form-row 밖으로 밀려나갔어요 (모바일에서 발생하던 문제). */
+  min-width: 0;
 }
 
 .input-with-unit input {
   flex: 1;
+  min-width: 0;
+  width: 100%;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 6px;
@@ -405,5 +410,28 @@ input[type="number"]::-webkit-inner-spin-button {
 /* 숫자 입력 화살표 제거 (Firefox) */
 input[type="number"] {
   -moz-appearance: textfield;
+}
+
+/* 모바일 반응형 (다른 화면들과 동일하게 768px 기준) */
+@media (max-width: 768px) {
+  .meal-input-container {
+    padding: 16px;
+  }
+
+  .form-card {
+    padding: 20px;
+  }
+
+  /* 라벨 + 입력을 가로로 붙여두면 좁은 화면에서 입력창이 밖으로 밀려나가서,
+     라벨을 위로 올리고 입력창은 한 줄 전체를 쓰도록 세로로 쌓아요. */
+  .form-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  .form-row label {
+    width: auto;
+  }
 }
 </style>
