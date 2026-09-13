@@ -19,7 +19,10 @@ npm test          # Vitest 실행 (2026-09-13부터)
 ```
 
 - **린트**: `eslint-plugin-vue`의 `flat/essential` 프리셋만 적용함 — v-for key 누락처럼 실제 버그로 이어지는 규칙만 검사하고, 들여쓰기/줄바꿈 같은 포맷팅 규칙(`flat/recommended`)은 기존 코드 전체를 갈아엎어야 해서 일부러 제외함. 포맷팅까지 통일하고 싶어지면 그때 Prettier 도입을 고려할 것.
-- **테스트**: 아직 컴포넌트 테스트는 없고, `src/router/guard.js`(네비게이션 가드 판정 로직)에 대한 단위 테스트만 있음 (`src/router/guard.test.js`). 이 로직을 `router/index.js`에서 분리해둔 이유는 vue-router/DOM 의존 없이 순수 함수로 테스트하기 위해서임 — 새 화면/권한 로직을 테스트하고 싶으면 이 패턴(순수 로직 분리 + `*.test.js`)을 참고할 것. `@vue/test-utils`도 설치는 해뒀지만 아직 컴포넌트 테스트 작성은 안 함.
+- **테스트**: 아직 컴포넌트 테스트는 없고, 단위 테스트만 두 곳 있음:
+  - `src/router/guard.js`(네비게이션 가드 판정 로직) → `guard.test.js`. `router/index.js`에서 분리해둔 이유는 vue-router/DOM 의존 없이 순수 함수로 테스트하기 위해서임 — 기본(node) 환경에서 돎.
+  - `src/api/axios.js`의 `handleAuthError`(401 응답 처리) → `axios.test.js`. `localStorage`/`window.location`이 필요해서 파일 맨 위에 `// @vitest-environment jsdom` 지정해서 이 파일만 jsdom 환경으로 돌림.
+  - 새 로직을 테스트하고 싶으면 이 패턴(DOM 비의존 로직은 분리해서 순수 함수로, DOM이 꼭 필요하면 파일별로 jsdom 지정)을 참고할 것. `@vue/test-utils`도 설치는 해뒀지만 아직 컴포넌트 테스트 작성은 안 함.
 
 로컬 개발 시 백엔드(Spring Boot)가 `localhost:8080`에서 떠 있어야 `/api/*` 요청이 정상 동작한다 (`vite.config.js`의 `server.proxy` 참고).
 

@@ -20,19 +20,23 @@ const api = axios.create({
     withXSRFToken: true
 })
 
-// 401 응답 시 로그인 화면으로 이동
-// (쿠키는 httpOnly라 여기서 직접 지울 수 없고, 서버가 만료 응답을 준 것뿐이라
-//  화면 전환용 role/username만 정리해요. 쿠키 자체는 /api/auth/logout이 지워요.)
-api.interceptors.response.use(
-    response => response,
-    error => {
-        if (error.response?.status === 401) {
-            localStorage.removeItem('role')
-            localStorage.removeItem('username')
-            window.location.href = '/'
-        }
-        return Promise.reject(error)
+/**
+ * 401 응답 처리 (인터셉터에서 분리 — src/api/axios.test.js에서 직접 테스트하기 위해서예요)
+ * 쿠키는 httpOnly라 여기서 직접 지울 수 없고, 서버가 만료/무효 응답을 준 것뿐이라
+ * 화면 전환용 role/username만 정리해요. 쿠키 자체는 /api/auth/logout이 지워요.
+ * 401이 아닌 에러(403, 네트워크 오류 등)는 그대로 두고, 어느 쪽이든 각 화면의
+ * catch에서 처리할 수 있도록 항상 reject된 Promise를 반환해요.
+ */
+export function handleAuthError(error) {
+    if (error.response?.status === 401) {
+        localStorage.removeItem('role')
+        localStorage.removeItem('username')
+        window.location.href = '/'
     }
-)
+    return Promise.reject(error)
+}
+
+// 401 응답 시 로그인 화면으로 이동
+api.interceptors.response.use(response => response, handleAuthError)
 
 export default api
