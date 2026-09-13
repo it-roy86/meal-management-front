@@ -32,7 +32,7 @@ npm run preview   # 빌드 결과 로컬 미리보기
 
 **폴더 구조**: `src/views/<기능>/`로 화면을 기능별로 묶는다 — `auth`(로그인), `dashboard`(메인 메뉴), `setting`(회사/팀/단가 관리, ADMIN 전용), `meal`(`MealInputView`: 일일 식사 입력용 OPERATOR 화면, `MealView`: 현황 조회 — 역할에 따라 조회 범위가 달라짐), `settlement`(월별 정산, ADMIN/VIEWER). 모든 라우트는 `router/index.js`에 지연 로딩(`() => import(...)`)으로 등록되어 있다.
 
-**API 통신**: `src/api/axios.js`의 공용 axios 인스턴스(`baseURL: ''`)를 모든 뷰가 직접 import해서 사용한다(별도 서비스/스토어 레이어 없음). 컴포넌트에서 상대경로 import(`../../api/axios`)를 쓰며, `jsconfig.json`에 `@/*` alias가 정의되어 있지만 `vite.config.js`에는 대응하는 `resolve.alias`가 없어 실제로는 동작하지 않는다 — 새 코드에서 `@/` import를 쓰지 말 것.
+**API 통신**: `src/api/axios.js`의 공용 axios 인스턴스(`baseURL: ''`)를 모든 뷰가 직접 import해서 사용한다(별도 서비스/스토어 레이어 없음). 기존 컴포넌트는 상대경로 import(`../../api/axios`)를 쓰고 있고, `jsconfig.json`의 `@/*` alias는 2026-09-13부터 `vite.config.js`의 `resolve.alias`와 맞춰서 실제로 동작한다(`@` → `src/`). 새 코드에서는 `@/api/axios`처럼 써도 되고, 기존 상대경로 import를 굳이 바꿀 필요는 없다.
 
 **금액 계산 로직**: 식사 입력/조회 화면에서 중식·석식 금액은 항상 `팀별 단가 × 인원수`로 프론트에서 계산해 보여준다(`computed` 사용). 단가(`lunchPrice`, `dinnerPrice`)는 팀 선택 시 함께 내려오는 팀 객체에 포함되어 있다.
 
