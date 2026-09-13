@@ -96,7 +96,7 @@
               <span>석식 {{ record.dinnerCount }}명</span>
               <span>총 {{ record.totalCount }}명</span>
             </div>
-            <button class="btn-edit-record" v-if="role === 'ADMIN'"[4="]e" @click="openEditModal(record)">✏️ 수정</button>
+            <button class="btn-edit-record" v-if="role === 'ADMIN'" @click="openEditModal(record)">✏️ 수정</button>
           </div>
         </div>
         <div v-if="mealRecords.length === 0" class="empty">조회된 데이터가 없습니다.</div>
@@ -235,6 +235,7 @@ export default {
         const response = await api.get('/api/companies')
         this.companies = response.data
       } catch (error) {
+        console.error('회사 목록 조회 실패', error)
         alert('회사 목록을 불러오는데 실패했습니다.')
       }
     },
@@ -258,6 +259,7 @@ export default {
         const response = await api.get('/api/meal-records', { params })
         this.mealRecords = response.data
       } catch (error) {
+        console.error('식사 기록 조회 실패', error)
         alert('식사 기록을 불러오는데 실패했습니다.')
       }
     },
@@ -299,6 +301,7 @@ export default {
         this.closeEditModal()
         await this.loadMealRecords()
       } catch (error) {
+        console.error('식사 기록 수정 실패', error)
         alert('수정에 실패했습니다.')
       }
     }

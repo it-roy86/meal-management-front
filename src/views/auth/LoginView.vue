@@ -123,7 +123,7 @@ export default {
         const response = await api.get('/api/companies/public')
         this.companies = response.data
       } catch (error) {
-        console.error('회사 목록 조회 실패')
+        console.error('회사 목록 조회 실패', error)
       }
     },
 
@@ -151,6 +151,7 @@ export default {
         else if (role === 'OPERATOR') this.$router.push('/meal-input')
 
       } catch (error) {
+        console.error('로그인 실패', error)
         this.errorMessage = '아이디 또는 비밀번호가 올바르지 않습니다.'
       } finally {
         this.isLoading = false
@@ -180,6 +181,7 @@ export default {
         this.$router.push('/meal-view')
 
       } catch (error) {
+        console.error('경리담당자 로그인 실패', error)
         this.errorMessage = '사업자번호가 올바르지 않습니다.'
       } finally {
         this.isLoading = false

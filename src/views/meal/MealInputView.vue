@@ -159,6 +159,7 @@ export default {
         const response = await api.get('/api/companies')
         this.companies = response.data
       } catch (error) {
+        console.error('회사 목록 조회 실패', error)
         alert('회사 목록을 불러오는데 실패했습니다.')
       }
     },
@@ -178,6 +179,7 @@ export default {
         const response = await api.get(`/api/companies/${this.form.companyId}/teams`)
         this.teams = response.data
       } catch (error) {
+        console.error('팀 목록 조회 실패', error)
         alert('팀 목록을 불러오는데 실패했습니다.')
       }
     },
@@ -221,7 +223,7 @@ export default {
       }
 
       try {
-        // POST /zzzzapi/meal-records
+        // POST /api/meal-records
         await api.post('/api/meal-records', {
           recordDate: this.form.recordDate,
           companyId: this.form.companyId,
@@ -241,6 +243,7 @@ export default {
         this.teams = []
 
       } catch (error) {
+        console.error('식사 기록 저장 실패', error)
         alert('저장에 실패했습니다.')
       }
     }

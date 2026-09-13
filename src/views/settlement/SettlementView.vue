@@ -193,6 +193,7 @@ export default {
         const response = await api.get('/api/companies')
         this.companies = response.data
       } catch (error) {
+        console.error('회사 목록 조회 실패', error)
         alert('회사 목록을 불러오는데 실패했습니다.')
       }
     },
@@ -214,6 +215,7 @@ export default {
         const response = await api.get('/api/settlement', { params })
         this.settlements = response.data
       } catch (error) {
+        console.error('정산 데이터 조회 실패', error)
         alert('정산 데이터를 불러오는데 실패했습니다.')
       }
     }

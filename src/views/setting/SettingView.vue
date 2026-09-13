@@ -236,6 +236,7 @@ export default {
         const response = await api.get('/api/companies')
         this.companies = response.data
       } catch (error) {
+        console.error('회사 목록 조회 실패', error)
         alert('회사 목록을 불러오는데 실패했습니다.')
       }
     },
@@ -298,6 +299,7 @@ export default {
         await this.loadCompanies()
         this.closeCompanyModal()
       } catch (error) {
+        console.error('회사 저장 실패', error)
         alert('저장에 실패했습니다.')
       }
     },
@@ -315,6 +317,7 @@ export default {
         const response = await api.get(`/api/companies/${companyId}/teams`)
         this.teams = response.data
       } catch (error) {
+        console.error('팀 목록 조회 실패', error)
         alert('팀 목록을 불러오는데 실패했습니다.')
       }
     },
@@ -374,6 +377,7 @@ export default {
         await this.loadTeams(this.selectedCompany.id)
         this.closeTeamModal()
       } catch (error) {
+        console.error('팀 저장 실패', error)
         alert('저장에 실패했습니다.')
       }
     }

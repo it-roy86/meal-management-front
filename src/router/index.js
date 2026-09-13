@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { resolveRouteGuard } from './guard'
 
 /**
  * Vue Router 설정
@@ -74,14 +75,6 @@ const routes = [
     }
 ]
 
-// 로그인 성공 시 role별로 이동시키는 기본 화면
-// LoginView.vue의 분기 로직과 동일하게 맞춰뒀어요 (역할별 화면 접근 거부 시 되돌아갈 곳으로도 사용).
-const HOME_BY_ROLE = {
-    ADMIN: '/dashboard',
-    OPERATOR: '/meal-input',
-    VIEWER: '/meal-view'
-}
-
 const router = createRouter({
     // createWebHistory: URL에 # 없이 깔끔한 경로 사용 (예: /dashboard)
     // createWebHashHistory를 쓰면 #이 붙어요 (예: /#/dashboard)
@@ -89,35 +82,9 @@ const router = createRouter({
     routes
 })
 
-/**
- * 네비게이션 가드
- * 화면 이동이 실제로 일어나기 전에 실행돼요.
- * - 로그인 화면(meta.public)은 그대로 통과
- * - role이 없으면(로그인 안 함) 로그인 화면으로 되돌림
- * - role은 있지만 현재 화면의 허용 role이 아니면 자기 role의 기본 화면으로 되돌림
- *
- * JWT는 httpOnly 쿠키로 관리돼서 JS로는 존재 여부를 알 수 없어요.
- * 그래서 로그인 여부는 로그인 성공 시 함께 저장해두는 localStorage의
- * role 값으로 판단해요. 쿠키가 실제로 만료/위조됐는지는 어차피 이 값과
- * 상관없이 API 호출 시 백엔드가 401로 걸러내고, axios 인터셉터가 그때
- * 로그인 화면으로 돌려보내요 (src/api/axios.js 참고).
- */
-router.beforeEach((to) => {
-    if (to.meta.public) {
-        return true
-    }
-
-    const role = localStorage.getItem('role')
-    if (!role) {
-        return '/'
-    }
-
-    const allowedRoles = to.meta.roles
-    if (allowedRoles && !allowedRoles.includes(role)) {
-        return HOME_BY_ROLE[role] ?? '/'
-    }
-
-    return true
-})
+// 네비게이션 가드 판정 로직은 './guard'에 분리해뒀어요 (vue-router/DOM 의존 없이
+// 단위 테스트하기 위해서 — src/router/guard.test.js 참고).
+// 로그인 여부/역할 판단 방식에 대한 자세한 설명도 그 파일 주석에 있어요.
+router.beforeEach((to) => resolveRouteGuard(to.meta, localStorage.getItem('role')))
 
 export default router
