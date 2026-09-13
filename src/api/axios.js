@@ -8,10 +8,16 @@ import axios from 'axios'
  *
  * JWT는 httpOnly 쿠키로 관리해요 (localStorage에 안 남아요).
  * withCredentials: true로 설정해야 브라우저가 쿠키를 요청에 실어 보내요.
+ *
+ * CSRF 토큰(XSRF-TOKEN 쿠키 → X-XSRF-TOKEN 헤더)은 axios가 기본적으로
+ * 자동 처리해줘요(쿠키 이름/헤더 이름이 서버 설정과 일치). withXSRFToken을
+ * true로 명시해서, 프록시 없이 백엔드에 직접(cross-origin) 요청하는
+ * 경우에도 항상 헤더가 붙도록 했어요.
  */
 const api = axios.create({
     baseURL: '',
-    withCredentials: true
+    withCredentials: true,
+    withXSRFToken: true
 })
 
 // 401 응답 시 로그인 화면으로 이동
