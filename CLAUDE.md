@@ -19,7 +19,8 @@ npm test          # Vitest 실행 (2026-09-13부터)
 ```
 
 - **린트**: `eslint-plugin-vue`의 `flat/essential` 프리셋만 적용함 — v-for key 누락처럼 실제 버그로 이어지는 규칙만 검사하고, 들여쓰기/줄바꿈 같은 포맷팅 규칙(`flat/recommended`)은 기존 코드 전체를 갈아엎어야 해서 일부러 제외함. 포맷팅까지 통일하고 싶어지면 그때 Prettier 도입을 고려할 것.
-- **테스트**: 아직 컴포넌트 테스트는 없고, 단위 테스트만 세 곳 있음:
+- **테스트**: 아직 컴포넌트 테스트는 없고, 단위 테스트만 네 곳 있음:
+  - `src/utils/download.js`의 `parseFilename`(`Content-Disposition` 헤더에서 한글 파일명 추출) → `download.test.js`. 같은 파일의 `saveBlob`은 DOM(링크 클릭)을 써서 테스트하지 않음.
   - `src/utils/date.js`(로컬 시간 기준 날짜 문자열 생성) → `date.test.js`. 파일 안에서 `process.env.TZ = 'Asia/Seoul'`로 타임존을 고정함 — UTC 환경에서는 `toISOString()` 버그가 재현되지 않아서 테스트가 무의미해지기 때문.
   - `src/router/guard.js`(네비게이션 가드 판정 로직) → `guard.test.js`. `router/index.js`에서 분리해둔 이유는 vue-router/DOM 의존 없이 순수 함수로 테스트하기 위해서임 — 기본(node) 환경에서 돎.
   - `src/api/axios.js`의 `handleAuthError`(401 응답 처리) → `axios.test.js`. `localStorage`/`window.location`이 필요해서 파일 맨 위에 `// @vitest-environment jsdom` 지정해서 이 파일만 jsdom 환경으로 돌림.
@@ -43,6 +44,8 @@ npm test          # Vitest 실행 (2026-09-13부터)
 **API 통신**: `src/api/axios.js`의 공용 axios 인스턴스(`baseURL: ''`)를 모든 뷰가 직접 import해서 사용한다(별도 서비스/스토어 레이어 없음). 기존 컴포넌트는 상대경로 import(`../../api/axios`)를 쓰고 있고, `jsconfig.json`의 `@/*` alias는 2026-09-13부터 `vite.config.js`의 `resolve.alias`와 맞춰서 실제로 동작한다(`@` → `src/`). 새 코드에서는 `@/api/axios`처럼 써도 되고, 기존 상대경로 import를 굳이 바꿀 필요는 없다.
 
 **날짜 처리**: 화면 기본값이나 API로 보낼 날짜 문자열은 반드시 `src/utils/date.js`(`formatDate`, `formatYearMonth`, `firstDayOfMonth`)로 만든다. `toISOString()`은 UTC 기준이라 한국 시간에서 날짜가 하루 밀린다 (2026-09-30에 수정한 버그 — 자세한 경위는 백엔드 저장소 `구내식당_웹앱_기획설계서.md` 17장 참고).
+
+**엑셀 다운로드**: 엑셀 파일은 프론트에서 만들지 않고 백엔드가 생성해서 내려준다(`GET /api/meal-records/excel`, 추후 메일 첨부 재사용 목적 — 백엔드 기획설계서 18장). 프론트는 `responseType: 'blob'`으로 받아 `src/utils/download.js`(`parseFilename`, `saveBlob`)로 저장만 한다. `MealView.vue`는 입력칸 현재 값이 아니라 마지막으로 조회에 성공한 조건(`lastSearchParams`)으로 다운로드해서 화면 결과와 엑셀 내용을 일치시킨다.
 
 **금액 계산 로직**: 식사 입력/조회 화면에서 중식·석식 금액은 항상 `팀별 단가 × 인원수`로 프론트에서 계산해 보여준다(`computed` 사용). 단가(`lunchPrice`, `dinnerPrice`)는 팀 선택 시 함께 내려오는 팀 객체에 포함되어 있다.
 

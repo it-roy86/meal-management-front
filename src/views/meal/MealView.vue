@@ -45,6 +45,34 @@
       <div class="result-header">
         <h3>조회 결과</h3>
         <span class="total-badge">총 {{ mealRecords.length }}건</span>
+        <button
+            class="btn-excel"
+            :disabled="mealRecords.length === 0 || downloading"
+            @click="downloadExcel"
+        >
+          <!-- 스프레드시트 + 다운로드 화살표 아이콘 (공식 Excel 로고는 상표 문제로 쓰지 않고 직접 그림) -->
+          <svg
+              class="icon-excel"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+          >
+            <!-- 시트 외곽 (오른쪽 아래는 화살표 자리로 비워둠) -->
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h5" />
+            <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+            <path d="M20 8v3" />
+            <!-- 표 격자 (2x2 셀) -->
+            <rect x="7" y="11" width="7" height="7" rx="1" />
+            <path d="M7 14.5h7M10.5 11v7" />
+            <!-- 다운로드 화살표 -->
+            <path d="M18 14v7M15.5 18.5 18 21l2.5-2.5" />
+          </svg>
+          <span>{{ downloading ? '다운로드 중...' : '엑셀 다운로드' }}</span>
+        </button>
       </div>
 
       <table class="table">
@@ -171,6 +199,7 @@
 <script>
 import api from '../../api/axios'
 import { firstDayOfMonth, formatDate } from '../../utils/date'
+import { parseFilename, saveBlob } from '../../utils/download'
 
 export default {
   name: 'MealView',
@@ -193,6 +222,11 @@ export default {
 
       // 식사 기록 목록
       mealRecords: [],
+      // 마지막으로 조회에 성공한 검색 조건
+      // 엑셀은 화면에 보이는 결과와 같아야 해서, 입력칸의 현재 값이 아니라 이 값으로 받아요.
+      lastSearchParams: null,
+      // 엑셀 다운로드 중 여부 (중복 클릭 방지)
+      downloading: false,
       // 수정 모달
       showEditModal: false,
       editingRecord: null,
@@ -259,9 +293,39 @@ export default {
 
         const response = await api.get('/api/meal-records', { params })
         this.mealRecords = response.data
+        this.lastSearchParams = params
       } catch (error) {
         console.error('식사 기록 조회 실패', error)
         alert('식사 기록을 불러오는데 실패했습니다.')
+      }
+    },
+
+    /**
+     * 엑셀 다운로드
+     * GET /api/meal-records/excel (조회 API와 같은 파라미터)
+     * 엑셀 파일은 백엔드가 만들어요 (추후 메일 발송 기능에서도 같은 파일을 첨부로 재사용하기 위해서예요).
+     * 파일명은 백엔드가 Content-Disposition 헤더로 내려줘요.
+     */
+    async downloadExcel() {
+      if (!this.lastSearchParams || this.downloading) return
+
+      this.downloading = true
+      try {
+        const response = await api.get('/api/meal-records/excel', {
+          params: this.lastSearchParams,
+          responseType: 'blob'
+        })
+        const { startDate, endDate } = this.lastSearchParams
+        const filename = parseFilename(
+            response.headers['content-disposition'],
+            `식대내역_${startDate}_${endDate}.xlsx`
+        )
+        saveBlob(response.data, filename)
+      } catch (error) {
+        console.error('엑셀 다운로드 실패', error)
+        alert('엑셀 다운로드에 실패했습니다.')
+      } finally {
+        this.downloading = false
       }
     },
     /**
@@ -422,6 +486,35 @@ export default {
   padding: 3px 10px;
   border-radius: 20px;
   font-size: 13px;
+}
+
+/* 엑셀 다운로드 버튼 - 조회 결과 헤더 오른쪽 끝 */
+.btn-excel {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #217346;
+  color: white;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.btn-excel:hover:not(:disabled) { background: #185c37; }
+
+.icon-excel {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.btn-excel:disabled {
+  background: #ccc;
+  cursor: not-allowed;
 }
 
 .table {
