@@ -103,6 +103,7 @@
 
 <script>
 import api from '../../api/axios'
+import { formatDate } from '../../utils/date'
 
 export default {
   name: 'MealInputView',
@@ -117,7 +118,7 @@ export default {
 
       // 입력 폼
       form: {
-        recordDate: new Date().toISOString().slice(0, 10), // 오늘 날짜 기본값
+        recordDate: formatDate(), // 오늘 날짜 기본값 (로컬 시간 기준)
         companyId: '',
         companyTeamId: '',
         lunchCount: 0,

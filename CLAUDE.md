@@ -19,7 +19,8 @@ npm test          # Vitest 실행 (2026-09-13부터)
 ```
 
 - **린트**: `eslint-plugin-vue`의 `flat/essential` 프리셋만 적용함 — v-for key 누락처럼 실제 버그로 이어지는 규칙만 검사하고, 들여쓰기/줄바꿈 같은 포맷팅 규칙(`flat/recommended`)은 기존 코드 전체를 갈아엎어야 해서 일부러 제외함. 포맷팅까지 통일하고 싶어지면 그때 Prettier 도입을 고려할 것.
-- **테스트**: 아직 컴포넌트 테스트는 없고, 단위 테스트만 두 곳 있음:
+- **테스트**: 아직 컴포넌트 테스트는 없고, 단위 테스트만 세 곳 있음:
+  - `src/utils/date.js`(로컬 시간 기준 날짜 문자열 생성) → `date.test.js`. 파일 안에서 `process.env.TZ = 'Asia/Seoul'`로 타임존을 고정함 — UTC 환경에서는 `toISOString()` 버그가 재현되지 않아서 테스트가 무의미해지기 때문.
   - `src/router/guard.js`(네비게이션 가드 판정 로직) → `guard.test.js`. `router/index.js`에서 분리해둔 이유는 vue-router/DOM 의존 없이 순수 함수로 테스트하기 위해서임 — 기본(node) 환경에서 돎.
   - `src/api/axios.js`의 `handleAuthError`(401 응답 처리) → `axios.test.js`. `localStorage`/`window.location`이 필요해서 파일 맨 위에 `// @vitest-environment jsdom` 지정해서 이 파일만 jsdom 환경으로 돌림.
   - 새 로직을 테스트하고 싶으면 이 패턴(DOM 비의존 로직은 분리해서 순수 함수로, DOM이 꼭 필요하면 파일별로 jsdom 지정)을 참고할 것. `@vue/test-utils`도 설치는 해뒀지만 아직 컴포넌트 테스트 작성은 안 함.
@@ -40,6 +41,8 @@ npm test          # Vitest 실행 (2026-09-13부터)
 **폴더 구조**: `src/views/<기능>/`로 화면을 기능별로 묶는다 — `auth`(로그인), `dashboard`(메인 메뉴), `setting`(회사/팀/단가 관리, ADMIN 전용), `meal`(`MealInputView`: 일일 식사 입력용 OPERATOR 화면, `MealView`: 현황 조회 — 역할에 따라 조회 범위가 달라짐), `settlement`(월별 정산, ADMIN/VIEWER). 모든 라우트는 `router/index.js`에 지연 로딩(`() => import(...)`)으로 등록되어 있다.
 
 **API 통신**: `src/api/axios.js`의 공용 axios 인스턴스(`baseURL: ''`)를 모든 뷰가 직접 import해서 사용한다(별도 서비스/스토어 레이어 없음). 기존 컴포넌트는 상대경로 import(`../../api/axios`)를 쓰고 있고, `jsconfig.json`의 `@/*` alias는 2026-09-13부터 `vite.config.js`의 `resolve.alias`와 맞춰서 실제로 동작한다(`@` → `src/`). 새 코드에서는 `@/api/axios`처럼 써도 되고, 기존 상대경로 import를 굳이 바꿀 필요는 없다.
+
+**날짜 처리**: 화면 기본값이나 API로 보낼 날짜 문자열은 반드시 `src/utils/date.js`(`formatDate`, `formatYearMonth`, `firstDayOfMonth`)로 만든다. `toISOString()`은 UTC 기준이라 한국 시간에서 날짜가 하루 밀린다 (2026-09-30에 수정한 버그 — 자세한 경위는 백엔드 저장소 `구내식당_웹앱_기획설계서.md` 17장 참고).
 
 **금액 계산 로직**: 식사 입력/조회 화면에서 중식·석식 금액은 항상 `팀별 단가 × 인원수`로 프론트에서 계산해 보여준다(`computed` 사용). 단가(`lunchPrice`, `dinnerPrice`)는 팀 선택 시 함께 내려오는 팀 객체에 포함되어 있다.
 

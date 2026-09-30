@@ -170,6 +170,7 @@
 
 <script>
 import api from '../../api/axios'
+import { firstDayOfMonth, formatDate } from '../../utils/date'
 
 export default {
   name: 'MealView',
@@ -181,9 +182,9 @@ export default {
       // 검색 조건
       search: {
         // 이번 달 1일부터 오늘까지 기본값
-        startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
-            .toISOString().slice(0, 10),
-        endDate: new Date().toISOString().slice(0, 10),
+        // (toISOString은 UTC 기준이라 한국 시간에서 하루 밀림 → utils/date 사용)
+        startDate: firstDayOfMonth(),
+        endDate: formatDate(),
         companyId: ''
       },
 

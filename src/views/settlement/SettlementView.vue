@@ -148,6 +148,7 @@
 
 <script>
 import api from '../../api/axios'
+import { formatYearMonth } from '../../utils/date'
 
 export default {
   name: 'SettlementView',
@@ -158,7 +159,7 @@ export default {
 
       // 검색 조건 (이번 달 기본값)
       search: {
-        yearMonth: new Date().toISOString().slice(0, 7), // yyyy-MM 형식
+        yearMonth: formatYearMonth(), // yyyy-MM 형식 (로컬 시간 기준)
         companyId: ''
       },
 
