@@ -47,3 +47,14 @@ npm test          # Vitest 실행 (2026-09-13부터)
 **금액 계산 로직**: 식사 입력/조회 화면에서 중식·석식 금액은 항상 `팀별 단가 × 인원수`로 프론트에서 계산해 보여준다(`computed` 사용). 단가(`lunchPrice`, `dinnerPrice`)는 팀 선택 시 함께 내려오는 팀 객체에 포함되어 있다.
 
 **배포**: `Dockerfile`은 2단계 빌드 — Node로 `npm run build` 후 `nginx:alpine`에 `dist/`를 서빙. `nginx.conf`가 SPA history 모드 fallback(`try_files ... /index.html`)과 `/api/` → `backend:8080` 프록시를 처리한다(로컬 Vite 프록시와 동일한 역할을 프로덕션에서는 Nginx가 대신함).
+
+## 서버/운영 현황 (2026-09 기준)
+
+- **현재 운영 서버 없음.** 예전에 쓰던 AWS Lightsail은 사용 중지했고, 지금은 **로컬 PC에서만** 백엔드(`localhost:8080`)와 프론트(`npm run dev`, `localhost:5173`)를 띄워서 실제 업무에 쓰고 있다.
+  - 따라서 코드를 수정하면 로컬 개발 서버에 바로 반영되는 것이 곧 "배포"다. git push는 코드 백업/이력 용도이고, push했다고 해서 따로 반영할 서버가 있는 것은 아님.
+  - 배포/인프라 관련 조언을 할 때 Lightsail 등 클라우드 서버를 전제로 하지 말 것.
+- **이사 후 자택 홈서버 구축 예정** (아직 미착수). 자세한 계획과 체크리스트는 백엔드 저장소(`D:\dev\meal-management`)의 `CLAUDE.md` "인프라 변경 예정" 섹션과 `구내식당_웹앱_기획설계서.md` 11-2를 기준으로 하고, 여기에는 프론트에 해당하는 것만 적는다.
+- **홈서버 구축 시 프론트 쪽에서 확인할 것**:
+  - 이 저장소의 `Dockerfile` + `nginx.conf`(SPA fallback, `/api/` → `backend:8080` 프록시)를 그대로 쓸 수 있는지. 리버스 프록시(HTTPS 종료)를 앞단에 따로 둔다면 이 Nginx와 역할이 겹치지 않게 정리할 것
+  - HTTPS로 서비스하게 되면 JWT 쿠키에 `Secure` 속성이 붙는지, 프론트와 API가 같은 도메인(same-origin)인지 확인할 것 — httpOnly 쿠키 인증과 CSRF 토큰(`withXSRFToken`)이 이 전제에 의존함
+  - 홈서버 구축이 시작되거나 완료되면 이 섹션을 갱신할 것
