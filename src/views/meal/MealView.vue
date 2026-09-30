@@ -578,6 +578,140 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
+/* 수정 버튼 (PC 테이블 + 모바일 카드 공통) */
+.btn-edit-record {
+  background: #fff3e0;
+  color: #e65100;
+  border: 1px solid #e65100;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.btn-edit-record:hover {
+  background: #e65100;
+  color: white;
+}
+
+/* 수정 모달 (PC/모바일 공통 — 모바일에서 달라지는 너비/여백만 아래 @media에 있음) */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  width: 380px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.modal h3 {
+  margin-bottom: 20px;
+  font-size: 18px;
+  color: #333;
+}
+
+.modal-info {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 16px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 14px;
+}
+
+.info-label {
+  color: #888;
+}
+
+.info-value {
+  color: #333;
+  font-weight: 500;
+}
+
+.modal-divider {
+  border-top: 1px solid #eee;
+  margin-bottom: 16px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #555;
+}
+
+.input-with-unit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.input-with-unit input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  text-align: right;
+}
+
+.input-with-unit input:focus {
+  outline: none;
+  border-color: #4a90e2;
+}
+
+.unit {
+  font-size: 14px;
+  color: #555;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.btn-cancel {
+  background: #f0f0f0;
+  color: #333;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-save {
+  background: #4a90e2;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-save:hover { background: #357abd; }
+
 /* 모바일 화면 대응 (768px 이하) */
 @media (max-width: 768px) {
 
@@ -667,159 +801,16 @@ input[type="number"] {
     color: #555;
   }
 
-  /* 인원 정보 */
+  /* 인원 정보 + 수정 버튼 */
   .mobile-record-footer {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
     gap: 12px;
     font-size: 12px;
     color: #888;
     border-top: 1px solid #eee;
     padding-top: 8px;
-  }
-
-  /* 합계 세로 정렬 */
-  .summary {
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 8px;
-  }
-  .btn-edit-record {
-    background: #fff3e0;
-    color: #e65100;
-    border: 1px solid #e65100;
-    padding: 4px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 13px;
-    white-space: nowrap;
-  }
-
-  .btn-edit-record:hover {
-    background: #e65100;
-    color: white;
-  }
-
-  .modal-overlay {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.4);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-
-  .modal {
-    background: white;
-    padding: 30px;
-    border-radius: 10px;
-    width: 380px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-  }
-
-  .modal h3 {
-    margin-bottom: 20px;
-    font-size: 18px;
-    color: #333;
-  }
-
-  .modal-info {
-    background: #f8f9fa;
-    border-radius: 8px;
-    padding: 14px;
-    margin-bottom: 16px;
-  }
-
-  .info-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 4px 0;
-    font-size: 14px;
-  }
-
-  .info-label {
-    color: #888;
-  }
-
-  .info-value {
-    color: #333;
-    font-weight: 500;
-  }
-
-  .modal-divider {
-    border-top: 1px solid #eee;
-    margin-bottom: 16px;
-  }
-
-  .form-group {
-    margin-bottom: 16px;
-  }
-
-  .form-group label {
-    display: block;
-    margin-bottom: 6px;
-    font-size: 14px;
-    color: #555;
-  }
-
-  .input-with-unit {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .input-with-unit input {
-    flex: 1;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 14px;
-    text-align: right;
-  }
-
-  .input-with-unit input:focus {
-    outline: none;
-    border-color: #4a90e2;
-  }
-
-  .unit {
-    font-size: 14px;
-    color: #555;
-  }
-
-  .modal-buttons {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    margin-top: 20px;
-  }
-
-  .btn-cancel {
-    background: #f0f0f0;
-    color: #333;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
-    cursor: pointer;
-  }
-
-  .btn-save {
-    background: #4a90e2;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
-    cursor: pointer;
-  }
-
-  .btn-save:hover { background: #357abd; }
-
-  /* 모바일 수정 버튼 */
-  .mobile-record-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
   }
 
   .mobile-record-counts {
@@ -829,12 +820,17 @@ input[type="number"] {
     color: #888;
   }
 
+  /* 합계 세로 정렬 */
+  .summary {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+  }
+
   /* 모바일 모달 */
-  @media (max-width: 768px) {
-    .modal {
-      width: 90%;
-      padding: 20px;
-    }
+  .modal {
+    width: 90%;
+    padding: 20px;
   }
 }
 </style>
